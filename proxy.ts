@@ -11,12 +11,23 @@ const protectedRoutes = [
   "/office-registry",
 ];
 
-const publicRoutes = ["/login", "/auth/login", "/auth/accept-invite"];
+const publicRoutes = [
+  "/login",
+  "/forgot-password",
+  "/auth/login",
+  "/auth/accept-invite",
+  "/auth/forgot-password",
+];
+
+function isExactOrSubpath(path: string, route: string): boolean {
+  if (route === "/") return path === "/";
+  return path === route || path.startsWith(`${route}/`);
+}
 
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
-  const isPublicRoute = publicRoutes.some((route) => path.startsWith(route)) || path === "/";
+  const isProtectedRoute = protectedRoutes.some((route) => isExactOrSubpath(path, route));
+  const isPublicRoute = publicRoutes.some((route) => isExactOrSubpath(path, route));
 
   const token = request.cookies.get("auth-token")?.value;
 
