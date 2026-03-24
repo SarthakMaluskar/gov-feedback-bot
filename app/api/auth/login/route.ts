@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       email: user.email,
       role: user.role,
       assignedDistrict: user.assignedDistrict,
-      assignedTalukas: user.assignedTalukas,
+      assignedTalukas: Array.from(user.assignedTalukas || []),
     });
 
     await setAuthCookie(token);

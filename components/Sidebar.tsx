@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 
 const navItems = [
   { path: '/', icon: LayoutGrid, label: 'Overview' },
-  { path: '/dashboard/regional', icon: Brain, label: 'Regional Intelligence' },
   { path: '/add-office', icon: Plus, label: 'Add New' },
   { path: '/office-registry', icon: Building2, label: 'Full Office Registry' },
   { path: '/feedback', icon: Radio, label: 'Live AI Feed' },

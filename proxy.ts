@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "./lib/auth";
 
 const protectedRoutes = [
-  "/dashboard",
+  "/",
   "/offices",
   "/reports",
   "/escalations",
@@ -39,7 +39,7 @@ export async function proxy(request: NextRequest) {
   if (isPublicRoute && token) {
     const payload = await verifyToken(token);
     if (payload) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL("/", request.url));
     }
   }
 
