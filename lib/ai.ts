@@ -5,13 +5,17 @@ import { checkEscalationForOffice } from "./escalation";
 
 
 // Ensure we don't crash if the key is missing during build or early dev
-const openai = process.env.OPENAI_API_KEY
-    ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+const deepseek = process.env.DEEPSEEK_API_KEY
+    ? new OpenAI({ apiKey: process.env.DEEPSEEK_API_KEY,
+        baseURL: "https://api.deepseek.com"
+     })
     : null;
 
 export async function processSessionWithAI(sessionId: string, officeId: string, answers: any, completedFlowsStr: string | null) {
-    if (!openai) {
-        console.warn("OPENAI_API_KEY not set. Skipping AI analysis.");
+    console.log("DeepSeek Key Exists:", !!process.env.DEEPSEEK_API_KEY);
+    console.log("Deepseek object:", !!deepseek);
+    if (!deepseek) {
+        console.warn("DEEPSEEK_API_KEY not set. Skipping AI analysis.");
         return null;
     }
 
@@ -52,8 +56,8 @@ Provide your analysis in the exact JSON format below. Do not use markdown wrappe
         console.log(`[AI] Triggering NLP analysis for Session ${sessionId}...`);
 
         // Quick, cheap, fast model
-        const response = await openai.chat.completions.create({
-            model: "gpt-5-nano-2025-08-07",
+        const response = await deepseek.chat.completions.create({
+            model: "deepseek-v4-flash",
             messages: [{ role: "system", content: prompt }],
             response_format: { type: "json_object" },
         });
@@ -111,7 +115,7 @@ Provide your analysis in the exact JSON format below. Do not use markdown wrappe
         return finalPayload;
 
     } catch (error) {
-        console.error("[AI] Error during OpenAI Analysis:", error);
+        console.error("[AI] Error during Deepseek Analysis:", error);
         return null;
     }
 }

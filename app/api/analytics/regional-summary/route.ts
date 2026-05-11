@@ -7,7 +7,7 @@ import { OpenAI } from "openai";
 
 export const dynamic = "force-dynamic";
 
-const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
+const deepseek = process.env.DEEPSEEK_API_KEY ? new OpenAI({ apiKey: process.env.DEEPSEEK_API_KEY, baseURL: "https://api.deepseek.com"}) : null;
 
 // Cache lifetime: 24 hours
 const CACHE_TTL_HOURS = 24;
@@ -108,7 +108,7 @@ export async function GET(req: NextRequest) {
         // 4. Trigger OpenAI
         let summaryText = `This region contains ${offices.length} offices with an average OMES of ${avgOmes}.`;
 
-        if (openai) {
+        if (deepseek) {
             const prompt = `
 You are the Chief Secretary AI for the Government of Maharashtra.
 Provide a concise, 3-paragraph executive summary on the performance of the ${regionName} ${regionType}.
@@ -127,14 +127,14 @@ Do not use markdown headers, just return paragraph text.
 `;
 
             try {
-                const aiRes = await openai.chat.completions.create({
-                    model: "gpt-4o-mini", // fast and cheap for text synthesis
+                const aiRes = await deepseek.chat.completions.create({
+                    model: "deepseek-v4-flash", // fast and cheap for text synthesis
                     messages: [{ role: "system", content: prompt }],
                     temperature: 0.3,
                 });
                 summaryText = aiRes.choices[0]?.message?.content?.trim() || summaryText;
             } catch (err: any) {
-                console.error("[Regional Summary] OpenAI Error:", err);
+                console.error("[Regional Summary] Deepseek Error:", err);
                 if (err.code === 'insufficient_quota' || err.status === 429) {
                     summaryText = "⚠️ [AI Quota Exceeded] You have reached your OpenAI billing limit or quota. Please check your OpenAI dashboard (platform.openai.com) to add credits. \n\n" + summaryText;
                 } else {
@@ -142,7 +142,7 @@ Do not use markdown headers, just return paragraph text.
                 }
             }
         } else {
-            summaryText = "[OPENAI_API_KEY Missing] " + summaryText;
+            summaryText = "[DEEPSEEK_API_KEY Missing] " + summaryText;
         }
 
         // 5. Save to Cache

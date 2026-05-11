@@ -371,7 +371,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         await session.save();
         
         // Launch AI sentiment extraction for all combined flows
-        processSessionWithAI(
+        await processSessionWithAI(
           session._id.toString(),
           session.office_id,
           session.answers,
